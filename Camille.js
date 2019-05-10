@@ -30,14 +30,15 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
       replier.reply("나는 나보다 약한 자의 명령은 듣지 않는다!");
     }
   }
+
   if(msg=="Hello"||msg=="hello") {
     if(room!="새 시대, 새 톡방") {
       replier.reply("Hi");
     }
   }
-  if(Chal1.step!=0&&room=="새 시대, 새 톡방") {
+  if(Chal1.step==0&&room=="새 시대, 새 톡방") {
     var rand=Math.random();
-    if(Chal1.offensive=1) {
+    if(Chal1.offensive==1) {
       replier.reply("왜ㅋㅋ 꼽냐?ㅋ 짜식");
       Chal1.offensive=0;
     }
@@ -192,10 +193,10 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
   }
   if(Chal1.step==7) {// turn starts
     var reply = "+=+=+=+=+=+=+=+=+=+=+\n"+Chal1.turn+"번째 턴!\n";
-    if(Chal1.turn==3||Chal1.turn==6||Chal1.turn==9) {
+    if(Chal1.turn==5||Chal1.turn==10||Chal1.turn==15) {
       reply = reply + "싸움이 길어지면서 소환수들이 지치고 있다!\n소환수들의 방어력이 감소했다!\n"
-      Player1.def = Player1.def*0.7;
-      Player2.def = Player2.def*0.7;
+      Player1.def = Player1.def*0.5;
+      Player2.def = Player2.def*0.5;
     }
     if(Player1.dex>Player2.dex) {// Player1 is faster
       reply = reply + battleseq(1);
@@ -463,20 +464,20 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
     };
     this.hpbar = function() {
       var ratio = Math.ceil(10*this.hp/this.maxhp);
-      var print = this.name+"\n[";
+      var print = this.name+"\n|";
       for(i = 0; i<ratio; i++) {
-        print = print+"=";
+        print = print+"■";//█■▬
       }
       for(i = 0; i<10-ratio; i++) {
-        print = print+"-";
+        print = print+"□";//▒□▭
       }
-      print = print+"] "+this.hp+"/"+this.maxhp+"\n";
+      print = print+"| "+this.hp+"/"+this.maxhp+"\n";
       return print;
     }
     this.printstat = function() {
       return this.name+"의 능력치\n체력: "+this.hp+"\n공격: "+this.atk+"\n"
       +"방어: "+this.def+"\n"+"명중: "+this.acc+"\n"+"운: "+this.luc+"\n"+"민첩: "
-      +this.dex+"\n";
+      +this.dex;
     }
   }
 
