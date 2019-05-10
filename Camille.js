@@ -58,6 +58,9 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
       if(msg=="이병 박찬후") {
         replier.reply("그래서 짬 맛있냐?");
       }
+      if(msg=="쥬~") {
+        replier.reply("ㄹㅇㅋㅋ");
+      }
     }
   }
   if(msg=="/help") {
