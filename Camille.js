@@ -136,9 +136,14 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
   }
 
   // Chal1 starts
-  if((Chal1.step!=0&&msg=="/대전 중지")&&(sender==Chal1.admin||sender==Chal1.name1||sender==Chal1.name2)) {
-    replier.reply("대전을 중지하겠다! 모두 퇴장!");
-    Chal1.step = 0;
+  if((Chal1.step!=0&&msg=="/대전 중지")) {
+    if((sender==Chal1.admin||sender==Chal1.name1||sender==Chal1.name2)) {
+      replier.reply("대전을 중지하겠다! 모두 퇴장!");
+      Chal1.step = 0;
+    }
+    else {
+      replier.reply("감히 신성한 대전을 멈추려 하다니! 무엄하다!");
+    }
   }
   if(Chal1.step!=0&&msg=="/대전 시작") {
     replier.reply("투기장이 이미 사용중일세!");
@@ -156,27 +161,20 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
   if(Chal1.step==2&&msg=="발"&&room==Chal1.room) {
     Chal1.name2=sender;
     replier.reply("두 번째 도전자는 "+Chal1.name2+"!\n"+Chal1.name1+"! 그대의 소환수의 이름은?");
-    Chal1.step=2.1;
-  }
-  if(Chal1.step==2.1&&room==Chal1.room&&sender==Chal1.name1) {
-    Player1 = new Player(msg);
-    replier.reply(Chal1.name2+"! 그대의 소환수의 이름은?");
-    Chal1.step=2.2;
-  }
-  if(Chal1.step==2.2&&room==Chal1.room&&sender==Chal1.name2) {
-    Player2 = new Player(msg);
-    replier.reply(Chal1.name2+"! 그대의 소환수의 이름은?");
     Chal1.step=3;
   }
-  if(Chal1.step==3) {
-    replier.reply(Player1.printstat()+"\n"+Player2.printstat());
+  if(Chal1.step==3&&room==Chal1.room&&sender==Chal1.name1) {
+    Player1 = new Player(msg);
+    replier.reply(Chal1.name2+"! 그대의 소환수의 이름은?");
+    Chal1.step=4;
+  }
+  if(Chal1.step==4&&room==Chal1.room&&sender==Chal1.name2) {
+    Player2 = new Player(msg);
+    replier.reply(Player1.printstat()+"\n+=+=+=+=+\n"+Player2.printstat());
     Chal1.hp1 = Player1.hp;
     Chal1.hp2 = Player2.hp;
     replier.reply("대전을 시작한다!");
     Chal1.turn=1;
-    Chal1.step=4;
-  }
-  if(Chal1.step==4) {
     replier.reply(Player1.name+"의 공격은?");
     Chal1.step=5;
   }
@@ -464,14 +462,14 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
     };
     this.hpbar = function() {
       var ratio = Math.ceil(10*this.hp/this.maxhp);
-      var print = this.name+"\n|";
+      var print = this.name+"\n[";
       for(i = 0; i<ratio; i++) {
         print = print+"■";//█■▬
       }
       for(i = 0; i<10-ratio; i++) {
         print = print+"□";//▒□▭
       }
-      print = print+"| "+this.hp+"/"+this.maxhp+"\n";
+      print = print+"] "+this.hp+"/"+this.maxhp+"\n";
       return print;
     }
     this.printstat = function() {
