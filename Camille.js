@@ -70,8 +70,8 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
     }
   }
   if(msg=="/help") {
-    replier.reply("<일반 커맨드>\n/고약한 야유\n/야유\n/배터리\n/능력치 (문자열)\n/계정 등록\n/전적 (ID)\n"
-    +"/대전 시작\n(문자열) 대 (문자열)\n\n<대전 커맨드>\n/항복\n(문자열)\n야유\n함성");
+    replier.reply("<일반 커맨드>\n/고약한 야유\n/야유\n/배터리\n/능력치 (이름)\n/계정 등록\n/전적 (ID)\n"
+    +"/대전 시작\n(이름) 대 (이름)\n\n<대전 커맨드>\n/항복\n(기술명)\n야유\n함성");
   }
   if(msg=="/고약한 야유") {
     var print = heckler();
@@ -148,7 +148,7 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
     var index = msg.indexOf("/전적");
     var ID = msg.substring(index+4);
     if(IDchecker(ID)) {
-      replier.reply(getWinrate(ID));
+      replier.reply(getRecords(ID));
     }
     else {
       replier.reply("등록되지 않은 ID일세!");
@@ -343,9 +343,8 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
       hit1 = Player2;
       hit2 = Player1;
     }
-    var dam = cutter(hit1.atkrank*Chal1.atkfactor*(hit1.atk+hit1.skillatk)*0.5*(100-Chal1.deffactor*hit2.def)/100);
+    var dam = cutter(hit1.rage*Chal1.atkfactor*(hit1.atk+hit1.skillatk)*0.5*(100-Chal1.deffactor*hit2.def*rank(hit2.defPlus)/rank(hit2.defMinus))/100);
     hit2.damage(dam);
-    hit1.atkrank=1;
     var print=hit2.name+"에게 "+dam+"의 피해!\n";
     return print;
   }
@@ -379,9 +378,8 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
       default:
         criexp = "몬가.. 몬가 일어났다!\n";
     }
-    var dam = cutter(crit1.atkrank*Chal1.atkfactor*(crit1.atk+crit1.skillatk)*0.5);
+    var dam = cutter(crit1.rage*Chal1.atkfactor*(crit1.atk+crit1.skillatk)*0.5);
     crit2.damage(dam);
-    crit1.atkrank=1;
     print=criexp+crit2.name+"에게 "+dam+"의 피해!\n";
     return print;
   }
@@ -395,9 +393,8 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
       count2 = Player1;
     }
 
-    var dam = cutter(0.3*Chal1.atkfactor*count2.atkrank*(count2.atk+count2.skillatk)*0.5*(100-Chal1.deffactor*count1.def)/100);
+    var dam = cutter(0.3*Chal1.atkfactor*count2.rage*(count2.atk+count2.skillatk)*0.5*(100-Chal1.deffactor*count1.def*rank(count1.defPlus)/rank(count1.defMinus))/100);
     count2.damage(dam);
-    count2.atkrank=1;
     var print=count1.name+", 공격을 피했다!\n"+count1.name+"의 반격!\n"+count2.name+"에게 "+dam+"의 피해!\n";
     return print;
   }
@@ -413,15 +410,15 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
     var factor = 2;
     switch (cry) {
       case 0:
-        crier.def = crier.def*factor;
+        crier.defPlus ++;
         print = print+crier.name+"의 방어력이 강해졌다!\n";
         break;
       case 1:
-        crier.acc = crier.acc*factor;
+        crier.accPlus ++;
         print = print+crier.name+"의 명중률이 올라갔다!\n";
         break;
       case 2:
-        crier.luc = crier.luc*factor;
+        crier.lucPlus ++;
         print = print+crier.name+"의 운이 좋아졌다!\n";
         break;
       case 3:
@@ -434,7 +431,6 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
   }
   function heckle(num) {// heck1 heckles heck2
     if(num == 1) {
-      // 덤벼라, 이 좆같은 조무래기야!
       heck1 = Player1;
       heck2 = Player2;
     }
@@ -444,23 +440,22 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
     }
     var heckle = Math.floor(Math.random()*4);
     var print = "\""+hecklebot()+"\"\n";
-    var factor = 0.5;
     switch (heckle) {
       case 0:
-        heck2.def = heck2.def*factor;
+        heck2.defMinus --;
         print = print+"야유를 듣고 "+heck2.name+"의 방어력이 약해졌다!\n";
         break;
       case 1:
-        heck2.acc = heck2.acc*factor;
+        heck2.accMinus --;
         print = print+"야유를 듣고 "+heck2.name+"의 명중률이 떨어졌다!\n";
         break;
       case 2:
-        heck2.luc = heck2.luc*factor;
+        heck2.lucMinus --;
         print = print+"야유를 듣고 "+heck2.name+"의 운이 나빠졌다!\n";
         break;
       case 3:
-        print = print+heck1.name+"의 야유는 "+heck2.name+"의 분노를 유발했다!\n"+heck2.name+"의 다음 공격이 더 강해졌다!\n";
-        heck2.atkrank = 1.5;
+        print = print+heck1.name+"의 야유는 "+heck2.name+"의 분노를 유발했다!\n"+heck2.name+"의 다음 턴 공격이 더 강해졌다!\n";
+        heck2.rage = 1.5;
         break;
       default:
         print = print+"몬가.. 몬가 일어나고 있다!\n";
@@ -496,8 +491,8 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
     }
     else {
       if(accrand<(70+seq1.acc*0.3)) {// successful attack
-        if(countrand>seq2.luc*Chal1.lucfactor) {// no counter
-          if(critrand>seq1.luc*Chal1.lucfactor) {// no critical
+        if(countrand>Chal1.lucfactor*seq2.luc*rank(seq2.lucPlus)/rank(seq2.lucMinus)) {// no counter
+          if(critrand>Chal1.lucfactor*seq1.luc*rank(seq1.lucPlus)/rank(seq1.lucMinus)) {// no critical
             print = print + Hit(num);
           }
           else {// critical
@@ -512,6 +507,8 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
         print = print + "공격이 빗나갔다!\n";
       }
     }
+    seq1.rage=1;
+    seq2.rage=1;
     return print;
   }
 
@@ -526,7 +523,13 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
     this.maxhp = cutter(140+0.6*statconverter(stat,8,10));
     this.hp = this.maxhp;
     this.dex = statconverter(stat,10,12);
-    this.atkrank=1;
+    this.rage=1;
+    this.lucPlus=1;
+    this.lucMinus=1;
+    this.defPlus=1;
+    this.defMinus=1;
+    this.accPlus=1;
+    this.accMinus=1;
     this.skill;
     this.skillatk;
     this.ID;
@@ -554,7 +557,9 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
       +this.dex;
     }
   }
-
+  function rank(num) {
+    return 3-2/num;
+  }
   function heckler() {
     var rand = Math.random();
     if(rand<0.5) {
@@ -822,7 +827,7 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
     var sjson = JSON.stringify(json);
     FileStream.write("/sdcard/katalkbot/Results.json",sjson);
   }
-  function getWinrate(ID) {
+  function getRecords(ID) {
     var json = JSON.parse(FileStream.read("/sdcard/katalkbot/Results.json"));
     return json[ID].name+"의 전적일세!\n전체 대전 수: "+json[ID].games+"\n전체 승리 수: "+json[ID].wins+"\n승리율: "+cutter(100*json[ID].wins/json[ID].games)+"%"
   }
@@ -1077,13 +1082,14 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
   }
 }
 
+/*
 function onStartCompile() {
-    /*컴파일 또는 Api.reload호출시, 컴파일 되기 이전에 호출되는 함수입니다.
-     *제안하는 용도: 리로드시 자동 백업*/
+    //컴파일 또는 Api.reload호출시, 컴파일 되기 이전에 호출되는 함수입니다.
+     /제안하는 용도: 리로드시 자동 백업
 }
 
 //아래 4개의 메소드는 액티비티 화면을 수정할때 사용됩니다.
-/*
+
 function onCreate(savedInstanceState,activity) {
     var layout=new android.widget.LinearLayout(activity);
     layout.setOrientation(android.widget.LinearLayout.HORIZONTAL);
