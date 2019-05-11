@@ -172,21 +172,22 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
       replier.reply("감히 신성한 대전을 멈추려 하다니! 무엄하다!");
     }
   }
-  if(Chal1.step>4&&msg=="/항복") {
-    if(sender==Chal1.name1) {
-      replier.reply(Chal1.name1+"의 항복으로 대전 중지! 승자는 "+Chal1.name2+"!"
+  if(Chal1.step!=0&&msg=="/항복") {
+    if(sender==Chal1.name1&&Chal1.step>4) {
+      replier.reply(Chal1.name1+"의 항복으로 대전 중지! 승자는 "+Chal1.name2+"!");
       addGame(Player1.ID, Player2.ID);
       addWin(Player1.ID);
+      Chal1.step=0
     }
-    else if(sender==Chal1.name2) {
-      replier.reply(Chal1.name2+"의 항복으로 대전 중지! 승자는 "+Chal1.name1+"!"
+    else if(sender==Chal1.name2&&Chal1.step>4) {
+      replier.reply(Chal1.name2+"의 항복으로 대전 중지! 승자는 "+Chal1.name1+"!");
       addGame(Player1.ID, Player2.ID);
       addWin(Player2.ID);
+      Chal1.step=0
     }
     else {
       replier.reply("싸워보지도 않고 항복하다니! 수치인 줄 알게!");
     }
-    Chal1.step=0
   }
 
   // Battle starts
@@ -261,10 +262,10 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
   }
   if(Chal1.step==7) {// turn starts
     var reply = "+=+=+=+=+=+=+=+=+=+=+\n"+Chal1.turn+"번째 턴!\n";
-    if(Chal1.turn==5||Chal1.turn==10||Chal1.turn==15) {
+    if(Chal1.turn==3||Chal1.turn==6||Chal1.turn==9) {
       reply = reply + "싸움이 길어지면서 소환수들이 지치고 있다!\n소환수들의 방어력이 감소했다!\n"
-      Player1.def = Player1.def*0.5;
-      Player2.def = Player2.def*0.5;
+      Player1.def = Player1.def*0.7;
+      Player2.def = Player2.def*0.7;
     }
     if(Player1.dex>Player2.dex) {// Player1 is faster
       reply = reply + battleseq(1);
@@ -513,7 +514,6 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
     }
     return print;
   }
-
 
   function Player(name) {// constructor
     this.md = MD5(name);
@@ -780,22 +780,6 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
    var temp = WordToHex(a) + WordToHex(b) + WordToHex(c) + WordToHex(d);
    return temp.toLowerCase();
   }
-/*
-  if(msg=="test") {
-    var json1 = new Object();
-    var json2 = new Object();
-    var jtot = new Object();
-    json1.name = "머저리";
-    json1.winrate = "30%";
-    jtot.pl1 = json1;
-    json2.name = "멍청이";
-    json2.winrate = "20%";
-    jtot.pl2 = json2;
-    var sjson = JSON.stringify(jtot);
-    FileStream.write("/sdcard/katalkbot/Results.json",sjson);
-    replier.reply("됐냐??");
-  }
-  */
 
   function IDchecker(ID) {// true if there's an ID
     var jtot = JSON.parse(FileStream.read("/sdcard/katalkbot/Results.json"));
