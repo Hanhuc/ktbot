@@ -11,6 +11,8 @@ function Challanger() {
   this.admin="박찬후";
   this.compilecheck=0;
   this.offensive=0;
+  this.signup=0;
+  this.newuser;
 }
 Chal1 = new Challanger();
 
@@ -65,7 +67,8 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
     }
   }
   if(msg=="/help") {
-    replier.reply("<일반 커맨드>\n/고약한 야유\n/야유\n/배터리\n/능력치 (문자열)\n/대전 시작\n(문자열) 대 (문자열)\n\n<대전 커맨드>\n/대전 중지\n(문자열)\n야유\n함성");
+    replier.reply("<일반 커맨드>\n/고약한 야유\n/야유\n/배터리\n/능력치 (문자열)\n/계정 등록\n/전적 (ID)\n"
+    +"/대전 시작\n(문자열) 대 (문자열)\n\n<대전 커맨드>\n/대전 중지\n(문자열)\n야유\n함성");
   }
   if(msg=="/고약한 야유") {
     var print = heckler();
@@ -138,6 +141,23 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
     replier.reply(reply);
   }
 
+  if(Chal1.signup==0&&msg=="/계정 등록") {
+    replier.reply("ID를 입력해주게!");
+    Chal1.newuser=sender;
+    Chal1.signup=1;
+  }
+  if(Chal1.signup==1&&sender==Chal1.newuser&&msg!="/계정 등록") {
+    newAccount(sender,msg);
+    Chal1.signup=0;
+    if(Chal1.step==3.2) {
+      replier.reply("그럼 "+Player1.name+", ID를 입력해주게!");
+    }
+    else if(Chal1.step==3.3) {
+      replier.reply("그럼 "+Player2.name+", ID를 입력해주게!");
+      Chal1.step==4;
+    }
+  }
+
   // Chal1 starts
   if((Chal1.step!=0&&msg=="/대전 중지")) {
     if((sender==Chal1.admin||sender==Chal1.name1||sender==Chal1.name2)) {
@@ -164,15 +184,26 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
   if(Chal1.step==2&&msg=="발"&&room==Chal1.room) {
     Chal1.name2=sender;
     replier.reply("두 번째 도전자는 "+Chal1.name2+"!\n"+Chal1.name1+"! 그대의 소환수의 이름은?");
-    Chal1.step=3;
+    Chal1.step=3.1;
   }
-  if(Chal1.step==3&&room==Chal1.room&&sender==Chal1.name1) {
+  if(Chal1.step==3.1&&room==Chal1.room&&sender==Chal1.name1) {
     Player1 = new Player(msg);
     replier.reply(Chal1.name2+"! 그대의 소환수의 이름은?");
+    Chal1.step=3.2;
+  }
+  if(Chal1.step==3.2&&room==Chal1.room&&sender==Chal1.name2) {
+    Player2 = new Player(msg);
+    replier.reply(Chal1.name1+"! ID를 입력해 주게나! 만약 계정이 없다면 [/계정 등록]을 입력하게!");
+    Chal1.step=3.3;
+  }
+
+  if(Chal1.step==3.3&&room==Chal1.room&&sender==Chal1.name1&&msg!="/계정 등록"&&Chal1.signup!=1) {
+    Player1.ID=msg;
+    replier.reply(Chal1.name2+"! ID를 입력해 주게나! 만약 계정이 없다면 [/계정 등록]을 입력하게!!");
     Chal1.step=4;
   }
-  if(Chal1.step==4&&room==Chal1.room&&sender==Chal1.name2) {
-    Player2 = new Player(msg);
+  if(Chal1.step==4&&room==Chal1.room&&sender==Chal1.name2&&msg!="/계정 등록"&&Chal1.signup!=1) {
+    Player2.ID=msg;
     replier.reply(Player1.printstat()+"\n+=+=+=+=+=+\n"+Player2.printstat());
     Chal1.hp1 = Player1.hp;
     Chal1.hp2 = Player2.hp;
@@ -457,6 +488,7 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
     this.atkrank=1;
     this.skill;
     this.skillatk;
+    this.ID;
     this.damage = function(dam) {
       this.hp = cutter(this.hp-dam);
       if(this.hp<=0) {
@@ -707,7 +739,7 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
    var temp = WordToHex(a) + WordToHex(b) + WordToHex(c) + WordToHex(d);
    return temp.toLowerCase();
   }
-
+/*
   if(msg=="test") {
     var json1 = new Object();
     var json2 = new Object();
@@ -722,25 +754,44 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
     FileStream.write("/sdcard/katalkbot/Results.json",sjson);
     replier.reply("됐냐??");
   }
-  if(msg=="test2") {
-    newResults(sender,hanhuc);
-  }
-  if(msg=="test3") {
-    var json = JSON.parse(FileStream.read("/sdcard/katalkbot/Results.json"));
-    var pl1 = json.pl1.name;
-    var pl2 = json.pl2.name;
-    var pl3 = json.hanhuc.name;
-    replier.reply(pl1 +" "+pl2+" "+pl3);
-  }
-  function newResults(realname,ID){
+  */
+
+
+  function newAccount(name,ID){
     var json = new Object();
     var jtot = JSON.parse(FileStream.read("/sdcard/katalkbot/Results.json"));
-    json.name = realname;
-    jtot.ID = json;
-    var sjson = JSON.stringify(jtot);
+    if(jtot[ID]==undefined) {
+      json[ID]= {
+        "name": name,
+        "games": 0,
+        "wins": 0
+      }
+      jtot = Object.assign(json,jtot);
+      var sjson = JSON.stringify(jtot);
+      FileStream.write("/sdcard/katalkbot/Results.json",sjson);
+      replier.reply("계정 등록이 완료되었네!");
+    }
+    else {
+      replier.reply("이미 등록된 계정명일세. 다른 이름을 입력해 주게나!");
+    }
+  }
+  function addGame(ID1,ID2) {
+    var json = JSON.parse(FileStream.read("/sdcard/katalkbot/Results.json"));
+    json[ID1].games=json[ID1].games + 1;
+    json[ID2].games=json[ID2].games + 1;
+    var sjson = JSON.stringify(json);
+    FileStream.write("/sdcard/katalkbot/Results.json",sjson);
+}
+  function addWin(ID) {
+    var json = JSON.parse(FileStream.read("/sdcard/katalkbot/Results.json"));
+    json[ID].wins=json[ID].wins + 1;
+    var sjson = JSON.stringify(json);
     FileStream.write("/sdcard/katalkbot/Results.json",sjson);
   }
-  function addResults(ID){}
+  function getWinrate(ID) {
+    var json = JSON.parse(FileStream.read("/sdcard/katalkbot/Results.json"));
+    return "승리율: "cutter(100*json[ID].wins/json[ID].games)+"%"
+  }
 
   function battle(pl1, pl2) {
     var left = new Player(pl1);
