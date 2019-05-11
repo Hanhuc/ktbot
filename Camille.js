@@ -15,7 +15,7 @@ function Challanger() {
 Chal1 = new Challanger();
 
 function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName, threadId) {
-  if(msg=="바람이여!") {
+  if(msg=="바람이여!"||msg=="/reload") {
     if(sender==Chal1.admin) {
       Api.reload();
       if(Chal1.compilecheck==0) {
@@ -65,7 +65,7 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
     }
   }
   if(msg=="/help") {
-    replier.reply("<일반 커맨드>\n/고약한 야유\n/야유\n/능력치 (문자열)\n/대전 시작\n(문자열) 대 (문자열)\n\n<대전 커맨드>\n/대전 중지\n(문자열)\n야유\n함성");
+    replier.reply("<일반 커맨드>\n/고약한 야유\n/야유\n/배터리\n/능력치 (문자열)\n/대전 시작\n(문자열) 대 (문자열)\n\n<대전 커맨드>\n/대전 중지\n(문자열)\n야유\n함성");
   }
   if(msg=="/고약한 야유") {
     var print = heckler();
@@ -74,6 +74,9 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
   if(msg=="/야유") {
     var print = hecklebot();
     replier.reply(print);
+  }
+  if(msg=="/배터리") {
+    replier.reply("배터리 잔량: "+Device.getBatteryLevel()+"%");
   }
   if(msg=="와!") {
     replier.reply("샌즈!");
@@ -170,7 +173,7 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
   }
   if(Chal1.step==4&&room==Chal1.room&&sender==Chal1.name2) {
     Player2 = new Player(msg);
-    replier.reply(Player1.printstat()+"\n+=+=+=+=+\n"+Player2.printstat());
+    replier.reply(Player1.printstat()+"\n+=+=+=+=+=+\n"+Player2.printstat());
     Chal1.hp1 = Player1.hp;
     Chal1.hp2 = Player2.hp;
     replier.reply("대전을 시작한다!");
