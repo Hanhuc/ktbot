@@ -225,17 +225,26 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
     Chal1.step=3.3;
   }
   if(Chal1.step==3.3&&room==Chal1.room&&sender==Chal1.name1&&msg!="/계정 등록"&&Chal1.signup==0) {
-    if(IDchecker(msg)) {
+    if(!IDchecker(msg)) {
+      replier.reply("등록되지 않은 ID일세! ID를 다시 입력해주게!");
+    }
+    else if(ownername(msg)!=sender) {
+      replier.reply("ID를 도용하려 들다니, 쓰레기 새끼! 자신의 ID를 입력하도록 하게!");
+    }
+    else {
       Player1.ID=msg;
       replier.reply(Chal1.name2+"! ID를 입력해 주게나! 만약 계정이 없다면 [/계정 등록]을 입력하게!");
       Chal1.step=4;
     }
-    else {
-      replier.reply("등록되지 않은 ID일세! ID를 다시 입력해주게!");
-    }
   }
   if(Chal1.step==4&&room==Chal1.room&&sender==Chal1.name2&&msg!="/계정 등록"&&Chal1.signup==0) {
-    if(IDchecker(msg)) {
+    if(!IDchecker(msg)) {
+      replier.reply("등록되지 않은 ID일세! ID를 다시 입력해주게!");
+    }
+    else if(ownername(msg)!=sender) {
+      replier.reply("ID를 도용하려 들다니, 쓰레기 새끼! 자신의 ID를 입력하도록 하게!");
+    }
+    else {
       Player2.ID=msg;
       replier.reply(Player1.printstat()+"\n+=+=+=+=+=+\n"+Player2.printstat());
       Chal1.hp1 = Player1.hp;
@@ -244,9 +253,6 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
       Chal1.turn=1;
       replier.reply(Player1.name+"의 공격은?");
       Chal1.step=5;
-    }
-    else {
-      replier.reply("등록되지 않은 ID일세! ID를 다시 입력해주게!");
     }
   }
   if(Chal1.step==5&&sender==Chal1.name1&&room==Chal1.room) {
@@ -311,7 +317,7 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
     }
     reply = reply+"+=+=+=+=+=+=+=+=+=+=+";
     replier.reply(reply);// print battle log
-    replier.reply(Player1.hpbar()+Player2.hpbar());
+    replier.reply(Player1.hpbar()+"\n"+Player2.hpbar());
     if(Player1.hp==0) {
       replier.reply("관중들이 환호하고 있군!");
       replier.reply(Chal1.name2+"의 승리일세! 축하하네!");
@@ -548,7 +554,7 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
       for(i = 0; i<10-ratio; i++) {
         print = print+"□";//▒□▭
       }
-      print = print+"] "+this.hp+"/"+this.maxhp+"\n";
+      print = print+"] "+this.hp+"/"+this.maxhp;
       return print;
     }
     this.printstat = function() {
@@ -794,6 +800,10 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
     else {
       return false
     }
+  }
+  function ownername(ID) {// return owner's name of the ID
+    var jtot = JSON.parse(FileStream.read("/sdcard/katalkbot/Results.json"));
+    return jtot[ID].name
   }
   function newAccount(name,ID){
     var json = new Object();
