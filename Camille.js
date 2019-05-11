@@ -11,6 +11,7 @@ function Challanger() {
   this.admin="박찬후";
   this.compilecheck=0;
   this.offensive=0;
+  this.offname;
   this.signup=0;
   this.newuser;
 }
@@ -40,13 +41,15 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
   }
   if(Chal1.step==0&&room=="새 시대, 새 톡방") {
     var rand=Math.random();
-    if(Chal1.offensive==1) {
-      replier.reply("왜ㅋㅋ 꼽냐?ㅋ 짜식");
+    if(Chal1.offensive==1&&sender==Chal1.offname) {
+      replier.reply("왜ㅋㅋ 꼽냐?ㅋ 새끼");
       Chal1.offensive=0;
+      Chal1.offname="초기화";
     }
     if(rand<0.005) {
-      replier.reply("뭘봐 짜샤");
+      replier.reply("뭘 봐, 짜샤!");
       Chal1.offensive=1;
+      Chal1.offname=sender;
     }
     else if(rand<0.01) {
       replier.reply("섹스");
@@ -68,7 +71,7 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
   }
   if(msg=="/help") {
     replier.reply("<일반 커맨드>\n/고약한 야유\n/야유\n/배터리\n/능력치 (문자열)\n/계정 등록\n/전적 (ID)\n"
-    +"/대전 시작\n(문자열) 대 (문자열)\n\n<대전 커맨드>\n/대전 중지\n(문자열)\n야유\n함성");
+    +"/대전 시작\n(문자열) 대 (문자열)\n\n<대전 커맨드>\n/항복\n(문자열)\n야유\n함성");
   }
   if(msg=="/고약한 야유") {
     var print = heckler();
@@ -83,18 +86,6 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
   }
   if(msg=="와!") {
     replier.reply("샌즈!");
-  }
-  if(msg.indexOf(" 대 ")!=-1) {//start battle
-    var index = msg.indexOf(" 대 ");
-    var left = msg.substring(0,index);
-    var right = msg.substring(index+3);
-    battle(left,right);
-  }
-  if(msg.indexOf("/능력치")!=-1) {
-    var index = msg.indexOf("/능력치");
-    var name = msg.substring(index+5);
-    var left = new Player(name);
-    replier.reply(left.printstat());
   }
   if(msg=="ㅇㅈ?"||msg.indexOf("특)")!=-1) {
     var admit = Math.floor(Math.random()*2);
@@ -140,6 +131,29 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
     }
     replier.reply(reply);
   }
+  if(msg.indexOf(" 대 ")!=-1) {//start battle
+    var index = msg.indexOf(" 대 ");
+    var left = msg.substring(0,index);
+    var right = msg.substring(index+3);
+    battle(left,right);
+  }
+
+  if(msg.indexOf("/능력치")!=-1) {
+    var index = msg.indexOf("/능력치");
+    var name = msg.substring(index+5);
+    var left = new Player(name);
+    replier.reply(left.printstat());
+  }
+  if(msg.indexOf("/전적")!=-1) {
+    var index = msg.indexOf("/전적");
+    var ID = msg.substring(index+4);
+    if(IDchecker(ID)) {
+      replier.reply(getWinrate(ID));
+    }
+    else {
+      replier.reply("등록되지 않은 ID일세!");
+    }
+  }
 
   if(Chal1.signup==0&&msg=="/계정 등록") {
     replier.reply("ID를 입력해주게!");
@@ -148,19 +162,9 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
   }
   if(Chal1.signup==1&&sender==Chal1.newuser&&msg!="/계정 등록") {
     newAccount(sender,msg);
-    Chal1.signup=0;
-    if(Chal1.step==3.2) {
-      replier.reply("그럼 "+Player1.name+", ID를 입력해주게!");
-    }
-    else if(Chal1.step==3.3) {
-      replier.reply("그럼 "+Player2.name+", ID를 입력해주게!");
-      Chal1.step==4;
-    }
   }
-
-  // Chal1 starts
   if((Chal1.step!=0&&msg=="/대전 중지")) {
-    if((sender==Chal1.admin||sender==Chal1.name1||sender==Chal1.name2)) {
+    if((sender==Chal1.admin)) {
       replier.reply("대전을 중지하겠다! 모두 퇴장!");
       Chal1.step = 0;
     }
@@ -168,6 +172,24 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
       replier.reply("감히 신성한 대전을 멈추려 하다니! 무엄하다!");
     }
   }
+  if(Chal1.step>4&&msg=="/항복") {
+    if(sender==Chal1.name1) {
+      replier.reply(Chal1.name1+"의 항복으로 대전 중지! 승자는 "+Chal1.name2+"!"
+      addGame(Player1.ID, Player2.ID);
+      addWin(Player1.ID);
+    }
+    else if(sender==Chal1.name2) {
+      replier.reply(Chal1.name2+"의 항복으로 대전 중지! 승자는 "+Chal1.name1+"!"
+      addGame(Player1.ID, Player2.ID);
+      addWin(Player2.ID);
+    }
+    else {
+      replier.reply("싸워보지도 않고 항복하다니! 수치인 줄 알게!");
+    }
+    Chal1.step=0
+  }
+
+  // Battle starts
   if(Chal1.step!=0&&msg=="/대전 시작") {
     replier.reply("투기장이 이미 사용중일세!");
   }
@@ -182,9 +204,14 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
     Chal1.step=2;
   }
   if(Chal1.step==2&&msg=="발"&&room==Chal1.room) {
-    Chal1.name2=sender;
-    replier.reply("두 번째 도전자는 "+Chal1.name2+"!\n"+Chal1.name1+"! 그대의 소환수의 이름은?");
-    Chal1.step=3.1;
+    if(sender==Chal1.name1) {
+      replier.reply("최고의 적은 항상 자기 자신이지! 하지만 이곳에선 금지되어 있다네! 두 번째 도전자여! 발을 높이 들게!");
+    }
+    else {
+      Chal1.name2=sender;
+      replier.reply("두 번째 도전자는 "+Chal1.name2+"!\n"+Chal1.name1+"! 그대의 소환수의 이름은?");
+      Chal1.step=3.1;
+    }
   }
   if(Chal1.step==3.1&&room==Chal1.room&&sender==Chal1.name1) {
     Player1 = new Player(msg);
@@ -196,21 +223,30 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
     replier.reply(Chal1.name1+"! ID를 입력해 주게나! 만약 계정이 없다면 [/계정 등록]을 입력하게!");
     Chal1.step=3.3;
   }
-
-  if(Chal1.step==3.3&&room==Chal1.room&&sender==Chal1.name1&&msg!="/계정 등록"&&Chal1.signup!=1) {
-    Player1.ID=msg;
-    replier.reply(Chal1.name2+"! ID를 입력해 주게나! 만약 계정이 없다면 [/계정 등록]을 입력하게!!");
-    Chal1.step=4;
+  if(Chal1.step==3.3&&room==Chal1.room&&sender==Chal1.name1&&msg!="/계정 등록"&&Chal1.signup==0) {
+    if(IDchecker(msg)) {
+      Player1.ID=msg;
+      replier.reply(Chal1.name2+"! ID를 입력해 주게나! 만약 계정이 없다면 [/계정 등록]을 입력하게!");
+      Chal1.step=4;
+    }
+    else {
+      replier.reply("등록되지 않은 ID일세! ID를 다시 입력해주게!");
+    }
   }
-  if(Chal1.step==4&&room==Chal1.room&&sender==Chal1.name2&&msg!="/계정 등록"&&Chal1.signup!=1) {
-    Player2.ID=msg;
-    replier.reply(Player1.printstat()+"\n+=+=+=+=+=+\n"+Player2.printstat());
-    Chal1.hp1 = Player1.hp;
-    Chal1.hp2 = Player2.hp;
-    replier.reply("대전을 시작한다!");
-    Chal1.turn=1;
-    replier.reply(Player1.name+"의 공격은?");
-    Chal1.step=5;
+  if(Chal1.step==4&&room==Chal1.room&&sender==Chal1.name2&&msg!="/계정 등록"&&Chal1.signup==0) {
+    if(IDchecker(msg)) {
+      Player2.ID=msg;
+      replier.reply(Player1.printstat()+"\n+=+=+=+=+=+\n"+Player2.printstat());
+      Chal1.hp1 = Player1.hp;
+      Chal1.hp2 = Player2.hp;
+      replier.reply("대전을 시작한다!");
+      Chal1.turn=1;
+      replier.reply(Player1.name+"의 공격은?");
+      Chal1.step=5;
+    }
+    else {
+      replier.reply("등록되지 않은 ID일세! ID를 다시 입력해주게!");
+    }
   }
   if(Chal1.step==5&&sender==Chal1.name1&&room==Chal1.room) {
     Player1.skill = msg;
@@ -278,11 +314,15 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
     if(Player1.hp==0) {
       replier.reply("관중들이 환호하고 있군!");
       replier.reply(Chal1.name2+"의 승리일세! 축하하네!");
+      addGame(Player1.ID, Player2.ID);
+      addWin(Player2.ID);
       Chal1.step = 0;
     }
     else if(Player2.hp==0) {
       replier.reply("관중들이 환호하고 있군!");
       replier.reply(Chal1.name1+"의 승리일세! 축하하네!");
+      addGame(Player1.ID, Player2.ID);
+      addWin(Player1.ID);
       Chal1.step = 0;
     }
     else {
@@ -290,7 +330,7 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
       Chal1.step=5;
     }
   }// turn ends
-  // Chal1 ends
+  // Battle ends
 
   // index of the subject will be the input
   function Hit(num) {// hit1 hits hit2
@@ -473,6 +513,7 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
     }
     return print;
   }
+
 
   function Player(name) {// constructor
     this.md = MD5(name);
@@ -756,7 +797,15 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
   }
   */
 
-
+  function IDchecker(ID) {// true if there's an ID
+    var jtot = JSON.parse(FileStream.read("/sdcard/katalkbot/Results.json"));
+    if(jtot[ID]!=undefined) {
+      return true
+    }
+    else {
+      return false
+    }
+  }
   function newAccount(name,ID){
     var json = new Object();
     var jtot = JSON.parse(FileStream.read("/sdcard/katalkbot/Results.json"));
@@ -770,9 +819,10 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
       var sjson = JSON.stringify(jtot);
       FileStream.write("/sdcard/katalkbot/Results.json",sjson);
       replier.reply("계정 등록이 완료되었네!");
+      Chal1.signup=0;
     }
     else {
-      replier.reply("이미 등록된 계정명일세. 다른 이름을 입력해 주게나!");
+      replier.reply("이미 등록된 ID일세. 다른 이름을 입력해 주게나!");
     }
   }
   function addGame(ID1,ID2) {
@@ -790,7 +840,7 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
   }
   function getWinrate(ID) {
     var json = JSON.parse(FileStream.read("/sdcard/katalkbot/Results.json"));
-    return "승리율: "cutter(100*json[ID].wins/json[ID].games)+"%"
+    return json[ID].name+"의 전적일세!\n전체 대전 수: "+json[ID].games+"\n전체 승리 수: "+json[ID].wins+"\n승리율: "+cutter(100*json[ID].wins/json[ID].games)+"%"
   }
 
   function battle(pl1, pl2) {
