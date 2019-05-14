@@ -23,16 +23,78 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
       replier.reply("빛이 당신을 태울 것입니다!");
     }
   }
+
   if(Cons.PCmake==0&&msg=="/캐릭터 생성") {
-    replier.reply("던전 월드의 세계에 오신것을 환영합니다!\n우선 이름과 직업을 입력해주세요.\n선택
-     가능한 직업은 다음과 같습니다: 도적 드루이드 마법사 사냥꾼 사제 성기사 음유시인 전사\n단,");
+    var jtot = JSON.parse(FileStream.read("/sdcard/katalkbot/PCs.json"));
+    if(jtot[sender]!=undefined) {
+      replier.reply("당신은 이미 캐릭터를 생성했습니다! 꼭 만들어야겠다면 [/캐릭터 삭제]를 입력해주세요.\n캐릭터 생성을 중지합니다.");
+    }
+    else {
+      replier.reply("던전 월드의 세계에 오신것을 환영합니다!\n우선 [이름/직업]을 입력해주세요. 직업의 종류는 다음과 같습니다:");
+      replier.reply("도적 드루이드 마법사 사냥꾼 사제 성기사 음유시인 전사");
+      Cons.newUser=sender;
+      Cons.PCmake=1;
+    }
   }
-
-
-
-
-
-
+  if(Cons.PCmake==1&&sender==Cons.newUser&&msg!="/캐릭터 생성") {
+    var arr = msg.split("/");
+    var json = new Object();
+    var jtot = JSON.parse(FileStream.read("/sdcard/katalkbot/PCs.json"));
+    var jobs = JSON.parse(FileStream.read("/sdcard/katalkbot/jobs.json"));
+    if(arr[1]==undefined) {
+      replier.reply("[이름/직업] 형식에 맞춰서 다시 입력해주세요.")
+    }
+    else if(jobs[arr[1]]==undefined) {
+      replier.reply("잘못된 직업명입니다! 직업의 종류는 다음과 같습니다:");
+      replier.reply("도적 드루이드 마법사 사냥꾼 사제 성기사 음유시인 전사");
+    }
+    else {
+      json[sender]={
+        "name": arr[0],
+        "jobs": arr[1],
+        "lvl": 1,
+        "exp": 0,
+        "근력": 0,
+        "민첩": 0,
+        "체력": 0,
+        "지성": 0,
+        "지혜": 0,
+        "매력": 0
+      }
+      jtot = Object.assign(json,jtot);
+      FileStream.write("/sdcard/katalkbot/PCs.json",JSON.stringify(jtot));
+      replier.reply("이제 능력치를 배분하도록 합시다!\n[16, 15, 13, 12, 9, 8]의 수치에 배정하고 싶은 능력치를 순서대로 입력해주세요.");
+      replier.reply("앞에 쓸수록 더 높은 능력치가 배정되니, 중요하게 생각하는 순서로 입력하면 됩니다.\n[근력/민첩/체력/지성/지혜/매력]과 같은 형식으로 입력하세요.");
+      Cons.PCmake=2;
+    }
+  }
+  if(Cons.PCmake==2&&sender==Cons.newUser) {
+    var arr = msg.split("/");
+    var jtot = JSON.parse(FileStream.read("/sdcard/katalkbot/PCs.json"));
+    if(arr[2]!=undefined) {
+      var check=0;
+      for(var i=0; i<6; i++) {
+        if(jtot[sender][arr[i]]!=undefined) {
+          check++;
+        }
+      }
+      if(check!=6) {
+        replier.reply("[근력/민첩/체력/지성/지혜/매력]과 같은 형식으로 입력하세요.\n앞에 쓸수록 더 높은 능력치가 배정되니, 중요하게 생각하는 순서로 입력하면 됩니다.")
+      }
+      else {
+        jtot[sender][arr[0]]=16;
+        jtot[sender][arr[1]]=15;
+        jtot[sender][arr[2]]=13;
+        jtot[sender][arr[3]]=12;
+        jtot[sender][arr[4]]=9;
+        jtot[sender][arr[5]]=8;
+        FileStream.write("/sdcard/katalkbot/PCs.json",JSON.stringify(jtot));
+        replier.reply("캐릭터 생성이 완료되었습니다!");
+        Cons.PCmake=0;
+      }
+    }
+  }
+  /*
   if(Cons.PCmake==0&&msg=="/캐릭터 생성") {
     replier.reply("던전 월드의 세계에 오신것을 환영헙나디!\n이름과 능력치를 입력해주세요.\n[16, 15, 13, 12, 9, 8]의 여섯 수치를 원하는 능력치에 배정합니다.\n각 능력치는 특정 판정에 능력수정치에 해당하는 변화를 줍니다.");
     replier.reply("\n1~3: -3\n4~5: -2\n6~8: -1\n9~12: 0\n13~15: +1\n16~17: +2\n18: +3");
@@ -89,6 +151,7 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
       }
     }
   }
+  */
   if(msg.indexOf("/캐릭터 삭제")!=-1) {
     var arr = msg.split("/");
     var json = new Object();

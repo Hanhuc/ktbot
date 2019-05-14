@@ -65,7 +65,7 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
       if(msg=="이병 박찬후") {
         replier.reply("그래서 짬 맛있냐?");
       }
-      if(msg.indexOf("쥬~")!=-1) {
+      if(msg.indexOf("듯")!=-1) {
         replier.reply("ㄹㅇㅋㅋ");
       }
     }
@@ -207,7 +207,7 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
   }
   if(Chal1.step==2&&msg=="발"&&room==Chal1.room) {
     if(sender==Chal1.name1) {
-      replier.reply("최고의 적은 항상 자기 자신이지! 하지만 이곳에선 금지되어 있다네! 두 번째 도전자여! 발을 높이 들게!");
+      replier.reply("최고의 적은 항상 자기 자신이지만, 이곳에선 금지되어 있다네! 두 번째 도전자여! 발을 높이 들게!");
     }
     else {
       Chal1.name2=sender;
