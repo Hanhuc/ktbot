@@ -66,7 +66,7 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
         replier.reply("그래서 짬 맛있냐?");
       }
       if(msg.indexOf("듯")!=-1) {
-        replier.reply("ㄹㅇㅋㅋ");
+        replier.reply("그러게");
       }
     }
   }
