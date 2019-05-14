@@ -46,35 +46,37 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
       Chal1.offensive=0;
       Chal1.offname="초기화";
     }
-    if(rand<0.005) {
-      replier.reply("뭘 봐, 짜샤!");
-      Chal1.offensive=1;
-      Chal1.offname=sender;
-    }
-    else if(rand<0.01) {
-      replier.reply("섹스");
-    }
-    else if(sender=="최커제"&&rand<0.1) {
-      replier.reply("ㄴ이세돌보다 바둑 못함");
-    }
     else {
-      if(msg=="Hello") {
-        replier.reply("Sex");
+      if(rand<0.005) {
+        replier.reply("뭘 봐, 짜샤!");
+        Chal1.offensive=1;
+        Chal1.offname=sender;
       }
+      else if(rand<0.01) {
+        replier.reply("섹스");
+      }
+      else if(sender=="최커제"&&rand<0.1) {
+        replier.reply("ㄴ이세돌보다 바둑 못함");
+      }
+      else {
+        if(msg=="Hello") {
+          replier.reply("Sex");
+        }
 
-      if(msg=="이병 박찬후") {
-        replier.reply("그래서 짬 맛있냐?");
-      }
-      if(msg.indexOf("듯")!=-1) {
-        replier.reply("그러게");
+        if(msg=="이병 박찬후") {
+          replier.reply("그래서 짬 맛있냐?");
+        }/*
+        if(msg.indexOf("듯")!=-1) {
+          replier.reply("그러게");
+        }*/
       }
     }
   }
   if(msg=="/help") {
-    replier.reply("<일반 커맨드>\n/고약한 야유\n/야유\n/배터리\n/능력치 (이름)\n/계정 등록\n/전적 (ID)\n"
-    +"/대전 시작\n(이름) 대 (이름)\n\n<대전 커맨드>\n/항복\n(기술명)\n야유\n함성");
+    replier.reply("<일반 커맨드>\n/고약한 야유  /야유\n/배터리 /능력치 (이름)\n/계정 등록 /전적 (ID)\n"
+    +"/대전 시작  (이름) 대 (이름)\n\n<대전 커맨드>\n/항복  (기술명)\n야유 함성");
   }
-  if(msg=="/고약한 야유") {
+  if(msg=="/고약한 야유"||msg=="/고약한야유") {
     var print = heckler();
     replier.reply(print);
   }
@@ -111,6 +113,9 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
     }
     else if(msg.indexOf("안녕")!=-1) {
       reply = "오! 안녕하세요!";
+    }
+    else if(msg.indexOf("잘 자")!=-1||msg.indexOf("잘자")!=-1) {
+      reply = "예, 안녕히 주무십시오!";
     }
     else {
       switch (rand) {
@@ -156,15 +161,15 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
     }
   }
 
-  if(Chal1.signup==0&&msg=="/계정 등록") {
+  if(Chal1.signup==0&&(msg=="/계정 등록"||msg=="/계정등록")) {
     replier.reply("ID를 입력해주게!");
     Chal1.newuser=sender;
     Chal1.signup=1;
   }
-  if(Chal1.signup==1&&sender==Chal1.newuser&&msg!="/계정 등록") {
+  if(Chal1.signup==1&&sender==Chal1.newuser&&msg!="/계정 등록"&&msg!="/계정등록") {
     newAccount(sender,msg);
   }
-  if((Chal1.step!=0&&msg=="/대전 중지")) {
+  if((Chal1.step!=0&&msg=="/대전 중지"||msg=="/대전중지")) {
     if((sender==Chal1.admin)) {
       replier.reply("대전을 중지하겠다! 모두 퇴장!");
       Chal1.step = 0;
@@ -192,10 +197,10 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
   }
 
   // Battle starts
-  if(Chal1.step!=0&&msg=="/대전 시작") {
+  if(Chal1.step!=0&&(msg=="/대전 시작"||msg=="/대전시작")) {
     replier.reply("투기장이 이미 사용중일세!");
   }
-  if(Chal1.step==0&&msg=="/대전 시작") {
+  if(Chal1.step==0&&(msg=="/대전 시작"||msg=="/대전시작")) {
     replier.reply("투기장에 온 것을 환영하네, 소환사여!\n첫 번째 도전자는 손을 들게!");
     Chal1.step=1;
     Chal1.room=room;
@@ -559,8 +564,8 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
       return print;
     }
     this.printstat = function() {
-      return this.name+"의 능력치\n체력: "+this.hp+"\n공격: "+this.atk+"\n"
-      +"방어: "+this.def+"\n"+"명중: "+this.acc+"\n"+"운: "+this.luc+"\n"+"민첩: "
+      return this.name+"의 능력치\n체력: "+this.hp+"  공격: "+this.atk+"\n"
+      +"방어: "+this.def+"  "+"명중: "+this.acc+"\n"+"운: "+this.luc+" 민첩: "
       +this.dex;
     }
   }
