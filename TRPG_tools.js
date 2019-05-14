@@ -210,10 +210,14 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
   if(msg.indexOf("/주사위")!=-1) {// /주사위/num1dnum2/stat
     var arr = msg.split("/");
     var stat;
-    //var jtot = JSON.parse(FileStream.read("/sdcard/katalkbot/PCs.json"));
     stat = jtot[sender][arr[3]];
     if(arr[2]==undefined) {
       replier.reply(dice1(2,6));
+    }
+    else if(arr[2]=="공격") {
+      var num = jobs[jtot[sender].직업].dmg;
+      replier.reply(jtot[sender].이름+"의 기본 피해는 d"+num+"!");
+      replier.reply(dice1(1,num));
     }
     else if(stat==undefined) {
       var num = arr[2].split("d");
