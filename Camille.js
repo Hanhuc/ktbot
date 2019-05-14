@@ -20,13 +20,13 @@ Chal1 = new Challanger();
 function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName, threadId) {
   if(msg=="바람이여!"||msg=="/reload") {
     if(sender==Chal1.admin) {
-      Api.reload();
+      Api.reload("Camille.js");
       if(Chal1.compilecheck==0) {
         replier.reply("내 명에 따라라!");
         Chal1.compilecheck=1;
       }
       else {
-        replier.reply("나는 나보다 약한 자의 명령은 듣지 않는다!");
+        replier.reply("파리같은 놈들!");
       }
     }
     else {
@@ -61,6 +61,7 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
       if(msg=="Hello") {
         replier.reply("Sex");
       }
+
       if(msg=="이병 박찬후") {
         replier.reply("그래서 짬 맛있냐?");
       }
@@ -176,13 +177,13 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
     if(sender==Chal1.name1&&Chal1.step>4) {
       replier.reply(Chal1.name1+"의 항복으로 대전 중지! 승자는 "+Chal1.name2+"!");
       addGame(Player1.ID, Player2.ID);
-      addWin(Player1.ID);
+      addWin(Player2.ID);
       Chal1.step=0
     }
     else if(sender==Chal1.name2&&Chal1.step>4) {
       replier.reply(Chal1.name2+"의 항복으로 대전 중지! 승자는 "+Chal1.name1+"!");
       addGame(Player1.ID, Player2.ID);
-      addWin(Player2.ID);
+      addWin(Player1.ID);
       Chal1.step=0
     }
     else {
