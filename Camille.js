@@ -791,7 +791,7 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
     Results[name2].games=Results[name2].games + 1;
     var sjson = JSON.stringify(Results);
     FileStream.write("/sdcard/katalkbot/Results.json",sjson);
-}
+  }
   function addWin(name) {
     Results[name].wins=Results[name].wins + 1;
     var sjson = JSON.stringify(Results);

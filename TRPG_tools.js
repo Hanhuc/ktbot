@@ -10,7 +10,7 @@ function Constants() {
 Cons = new Constants();
 
 function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName, threadId) {
-  var jtot = JSON.parse(FileStream.read("/sdcard/katalkbot/PCs.json"));
+  var PCs = JSON.parse(FileStream.read("/sdcard/katalkbot/PCs.json"));
   var jobs = JSON.parse(FileStream.read("/sdcard/katalkbot/jobs.json"));
   if(msg=="감사합니다!"||msg=="/re") {
     if(sender==Cons.admin||sender=="마스터") {
@@ -28,14 +28,14 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
     }
   }
   if(msg=="/도움") {
-    replier.reply("/캐릭터 생성  /캐릭터 삭제\n/캐릭터 정보  /능력수정치\n/레벨업\n/주사위/개수d면수/능력치\n  : [/주사위] 이외는 선택사항입니다.");//\n/피해/피해량/이름  /치유/치유량/이름
+    replier.reply("/캐릭터 생성  /캐릭터 삭제\n/캐릭터 정보  /능력수정치\n/레벨업\n/주사위/개수d면수/능력치\n  : [/주사위] 이외는 선택사항입니다.");//\n/피해/이름/피해량  /치유/이름/치유량
   }
   if(Cons.PCmake!=0&&(msg=="/캐릭터 생성"||msg=="/캐릭터생성")) {
     replier.reply("다른 사람이 캐릭터를 생성하고 있습니다!");
   }
   if(Cons.PCmake==0&&(msg=="/캐릭터 생성"||msg=="/캐릭터생성")) {
-    //var jtot = JSON.parse(FileStream.read("/sdcard/katalkbot/PCs.json"));
-    if(jtot[sender]!=undefined) {
+    //var PCs = JSON.parse(FileStream.read("/sdcard/katalkbot/PCs.json"));
+    if(PCs[sender]!=undefined) {
       replier.reply("당신은 이미 캐릭터를 생성했습니다! 꼭 만들어야겠다면 [/캐릭터 삭제]를 입력해주세요.\n캐릭터 생성을 중지합니다.");
     }
     else {
@@ -48,7 +48,7 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
   if(Cons.PCmake==1&&sender==Cons.newUser&&msg!="/캐릭터 생성"&&msg!="/캐릭터생성") {
     var arr = msg.split("/");
     var json = new Object();
-    //var jtot = JSON.parse(FileStream.read("/sdcard/katalkbot/PCs.json"));
+    //var PCs = JSON.parse(FileStream.read("/sdcard/katalkbot/PCs.json"));
     //var jobs = JSON.parse(FileStream.read("/sdcard/katalkbot/jobs.json"));
     if(arr[1]==undefined) {
       replier.reply("[이름/직업] 형식에 맞춰서 다시 입력해주세요.")
@@ -73,8 +73,8 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
         "지혜": 0,
         "매력": 0
       }
-      jtot = Object.assign(json,jtot);
-      FileStream.write("/sdcard/katalkbot/PCs.json",JSON.stringify(jtot));
+      PCs = Object.assign(json,PCs);
+      FileStream.write("/sdcard/katalkbot/PCs.json",JSON.stringify(PCs));
       replier.reply("이제 능력치를 배분하도록 합시다!\n[16, 15, 13, 12, 9, 8]의 수치에 배정하고 싶은 능력치를 순서대로 입력해주세요.");
       replier.reply("앞에 쓸수록 더 높은 능력치가 배정되니, 중요하게 생각하는 순서로 입력하면 됩니다.\n[근력/민첩/체력/지능/지혜/매력]과 같은 형식으로 입력하세요.");
       Cons.PCmake=2;
@@ -82,12 +82,12 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
   }
   if(Cons.PCmake==2&&sender==Cons.newUser) {
     var arr = msg.split("/");
-    //var jtot = JSON.parse(FileStream.read("/sdcard/katalkbot/PCs.json"));
+    //var PCs = JSON.parse(FileStream.read("/sdcard/katalkbot/PCs.json"));
     //var jobs = JSON.parse(FileStream.read("/sdcard/katalkbot/jobs.json"));
     if(arr[2]!=undefined) {
       var check=0;
       for(var i=0; i<6; i++) {
-        if(jtot[sender][arr[i]]!=undefined) {
+        if(PCs[sender][arr[i]]!=undefined) {
           check++;
         }
       }
@@ -95,15 +95,15 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
         replier.reply("[근력/민첩/체력/지능/지혜/매력]과 같은 형식으로 입력하세요.\n앞에 쓸수록 더 높은 능력치가 배정되니, 중요하게 생각하는 순서로 입력하면 됩니다.")
       }
       else {
-        jtot[sender][arr[0]]=16;
-        jtot[sender][arr[1]]=15;
-        jtot[sender][arr[2]]=13;
-        jtot[sender][arr[3]]=12;
-        jtot[sender][arr[4]]=9;
-        jtot[sender][arr[5]]=8;
-        jtot[sender].MAXHP=jobs[jtot[sender].직업].HP+jtot[sender].체력;
-        jtot[sender].HP=jtot[sender].MAXHP;
-        FileStream.write("/sdcard/katalkbot/PCs.json",JSON.stringify(jtot));
+        PCs[sender][arr[0]]=16;
+        PCs[sender][arr[1]]=15;
+        PCs[sender][arr[2]]=13;
+        PCs[sender][arr[3]]=12;
+        PCs[sender][arr[4]]=9;
+        PCs[sender][arr[5]]=8;
+        PCs[sender].MAXHP=jobs[PCs[sender].직업].HP+PCs[sender].체력;
+        PCs[sender].HP=PCs[sender].MAXHP;
+        FileStream.write("/sdcard/katalkbot/PCs.json",JSON.stringify(PCs));
         replier.reply("캐릭터 생성이 완료되었습니다!");
         Cons.PCmake=0;
       }
@@ -111,65 +111,71 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
   }
   if(msg.indexOf("/피해")!=-1&&(sender=="마스터"||sender==Cons.admin)) {
     var arr = msg.split("/");
-    var name;
+    var name
+    /*
     if(arr[3]==undefined) {
       name=sender;
     }
     else {
       name=arr[3];
     }
-    jtot[name].HP = jtot[name].HP - Math.abs(arr[2]);
-    if(jtot[name].HP<0) {
-      jtot[name].HP = 0;
+    */
+    name = arr[2];
+    PCs[name].HP = PCs[name].HP - Math.abs(arr[3]);
+    if(PCs[name].HP<0) {
+      PCs[name].HP = 0;
     }
-    FileStream.write("/sdcard/katalkbot/PCs.json",JSON.stringify(jtot));
-    replier.reply(jtot[name].이름+"에게 "+Math.abs(arr[2])+"의 피해! HP: "+jtot[name].HP+"/"+jtot[name].MAXHP);
+    FileStream.write("/sdcard/katalkbot/PCs.json",JSON.stringify(PCs));
+    replier.reply(PCs[name].이름+"에게 "+Math.abs(arr[3])+"의 피해! HP: "+PCs[name].HP+"/"+PCs[name].MAXHP);
   }
   if(msg.indexOf("/치유")!=-1&&(sender=="마스터"||sender==Cons.admin)) {
     var arr = msg.split("/");
     var name;
+    /*
     if(arr[3]==undefined) {
       name=sender;
     }
     else {
       name=arr[3];
     }
-    jtot[name].HP = 1*jtot[name].HP + Math.abs(arr[2]);
-    if(jtot[name].HP>jtot[name].MAXHP) {
-      jtot[name].HP=jtot[name].MAXHP;
+    */
+    name = arr[2];
+    PCs[name].HP = 1*PCs[name].HP + Math.abs(arr[3]);
+    if(PCs[name].HP>PCs[name].MAXHP) {
+      PCs[name].HP=PCs[name].MAXHP;
     }
-    FileStream.write("/sdcard/katalkbot/PCs.json",JSON.stringify(jtot));
-    replier.reply(jtot[name].이름+"에게 "+Math.abs(arr[2])+"의 치유! HP: "+jtot[name].HP+"/"+jtot[name].MAXHP);
+    FileStream.write("/sdcard/katalkbot/PCs.json",JSON.stringify(PCs));
+    replier.reply(PCs[name].이름+"에게 "+Math.abs(arr[3])+"의 치유! HP: "+PCs[name].HP+"/"+PCs[name].MAXHP);
   }
   if(Cons.lvlup==0&&msg=="/레벨업") {
     var name = sender;
     Cons.lvlUser = name;
 
-    if(jtot[name].경험치<jtot[name].레벨*1 + 7) {
-      var exp = jtot[name].레벨*1 + 7 - jtot[name].경험치*1;
+    if(PCs[name].경험치<PCs[name].레벨*1 + 7) {
+      var exp = PCs[name].레벨*1 + 7 - PCs[name].경험치*1;
       replier.reply("경험치가 부족합니다! 레벨업을 하려면 현재 레벨+7 만큼의 경험치가 필요합니다.\n필요 경험치: "+exp);
     }
     else {
-      jtot[name].경험치 = jtot[name].경험치*1 - jtot[name].레벨*1 - 7;
-      jtot[name].레벨 = jtot[name].레벨*1 + 1;
-      FileStream.write("/sdcard/katalkbot/PCs.json",JSON.stringify(jtot));
-      replier.reply("축하합니다! 당신의 레벨이 1 올라 "+jtot[name].레벨+" 레벨이 되었습니다!\n강화하고싶은 능력치를 한 개 골라주세요.");
+      PCs[name].경험치 = PCs[name].경험치*1 - PCs[name].레벨*1 - 7;
+      PCs[name].레벨 = PCs[name].레벨*1 + 1;
+      FileStream.write("/sdcard/katalkbot/PCs.json",JSON.stringify(PCs));
+      replier.reply("축하합니다! 당신의 레벨이 1 올라 "+PCs[name].레벨+" 레벨이 되었습니다!\n강화하고싶은 능력치를 한 개 골라주세요.");
       replier.reply(printstat(name));
       Cons.lvlup = 1;
     }
   }
   if(Cons.lvlup==1&&Cons.lvlUser==sender&&msg!="/레벨업") {
     var name = sender;
-    if(jtot[name][msg]==undefined) {
+    if(PCs[name][msg]==undefined) {
       replier.reply("올바른 능력치를 입력해주세요.");
     }
-    else if(jtot[name][msg]==18) {
+    else if(PCs[name][msg]==18) {
       replier.reply("그 능력치는 이미 최고 수준에 달했습니다! 다른 능력치를 골라주세요.");
     }
     else {
-      jtot[name][msg] = jtot[name][msg]*1 +1;
-      jtot[name].MAXHP =jobs[jtot[name].직업].HP+jtot[name].체력;
-      FileStream.write("/sdcard/katalkbot/PCs.json",JSON.stringify(jtot));
+      PCs[name][msg] = PCs[name][msg]*1 +1;
+      PCs[name].MAXHP =jobs[PCs[name].직업].HP+PCs[name].체력;
+      FileStream.write("/sdcard/katalkbot/PCs.json",JSON.stringify(PCs));
       replier.reply("해당 능력치가 1 올랐습니다!");
       replier.reply(printstat(name));
       Cons.lvlup=0;
@@ -188,20 +194,19 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
         name=arr[3];
       }
       */
-      jtot[name].경험치 = jtot[name].경험치*1 +1;
-      FileStream.write("/sdcard/katalkbot/PCs.json",JSON.stringify(jtot));
-      replier.reply( jtot[name].이름+", 당신은 충분한 경험을 쌓아 경험치를 1 받았습니다!");
+      PCs[name].경험치 = PCs[name].경험치*1 +1;
+      FileStream.write("/sdcard/katalkbot/PCs.json",JSON.stringify(PCs));
+      replier.reply( PCs[name].이름+", 당신은 충분한 경험을 쌓아 경험치를 1 받았습니다!");
       replier.reply(printstat(name));
       }
     }
   if(msg.indexOf("/캐릭터 삭제")!=-1) {
     var arr = msg.split("/");
     var json = new Object();
-    //var jtot = JSON.parse(FileStream.read("/sdcard/katalkbot/PCs.json"));
     replier.reply("아직 미구현된 기능입니다! 꼬와? 꼽냐고\n관리자에게 문의해라")
   }
   if(msg=="/캐릭터 정보"||msg=="/캐릭터정보") {
-    if(jtot[sender]==undefined) {
+    if(PCs[sender]==undefined) {
       replier.reply("아직 캐릭터를 생성하지 않았습니다! [/캐릭터 생성]을 입력하여 새 캐릭터를 만드세요!");
     }
     else {
@@ -219,10 +224,10 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
       replier.reply(dice1(2,6));
     }
     else {
-      stat = jtot[sender];
+      stat = PCs[sender];
       if(arr[2]=="공격") {
-        var num = jobs[jtot[sender].직업].dmg;
-        replier.reply(jtot[sender].이름+"의 기본 피해는 d"+num+"!");
+        var num = jobs[PCs[sender].직업].dmg;
+        replier.reply(PCs[sender].이름+"의 기본 피해는 d"+num+"!");
         replier.reply(dice1(1,num));
       }
       else if(stat==undefined) {
@@ -283,6 +288,6 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
     return print;
   }
   function printstat(name) {
-    return "이름: "+jtot[name].이름+"\n직업: "+jtot[name].직업+"\n+=+=+=+=+=+\n레벨: "+jtot[name].레벨+"  경험치: "+jtot[name].경험치+"\nHP: "+jtot[name].HP+"/"+jtot[name].MAXHP+"  하중: "+jtot[name].하중+"\n+=+=+=+=+=+\n근력: "+jtot[name].근력+"  체력: "+jtot[name].체력+"\n민첩: "+jtot[name].민첩+"  지능: "+jtot[name].지능+"\n지혜: "+jtot[name].지혜+"  매력: "+jtot[name].매력;
+    return "이름: "+PCs[name].이름+"\n직업: "+PCs[name].직업+"\n+=+=+=+=+=+\n레벨: "+PCs[name].레벨+"  경험치: "+PCs[name].경험치+"\nHP: "+PCs[name].HP+"/"+PCs[name].MAXHP+"  하중: "+PCs[name].하중+"\n+=+=+=+=+=+\n근력: "+PCs[name].근력+"  체력: "+PCs[name].체력+"\n민첩: "+PCs[name].민첩+"  지능: "+PCs[name].지능+"\n지혜: "+PCs[name].지혜+"  매력: "+PCs[name].매력;
   }
 }
