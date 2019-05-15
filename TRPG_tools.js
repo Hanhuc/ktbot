@@ -28,7 +28,7 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
     }
   }
   if(msg=="/도움") {
-    replier.reply("/캐릭터 생성  /캐릭터 삭제\n/캐릭터 정보  /능력수정치\n/레벨업\n/주사위/개수d면수/능력치\n  : [/주사위] 이외는 선택사항입니다.");//\n/피해/이름/피해량  /치유/이름/치유량
+    replier.reply("/캐릭터 생성  /캐릭터 삭제\n/캐릭터 정보  /능력수정치\n/레벨업  /하중수정/(무게)\n/주사위/개수d면수/능력치\n  : [/주사위] 이외는 선택사항입니다.");//\n/피해/이름/피해량  /치유/이름/치유량
   }
   if(Cons.PCmake!=0&&(msg=="/캐릭터 생성"||msg=="/캐릭터생성")) {
     replier.reply("다른 사람이 캐릭터를 생성하고 있습니다!");
@@ -174,7 +174,7 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
     }
     else {
       PCs[name][msg] = PCs[name][msg]*1 +1;
-      PCs[name].MAXHP =jobs[PCs[name].직업].HP+PCs[name].체력;
+      PCs[name].MAXHP =jobs[PCs[name].직업].HP*1+PCs[name].체력*1;
       FileStream.write("/sdcard/katalkbot/PCs.json",JSON.stringify(PCs));
       replier.reply("해당 능력치가 1 올랐습니다!");
       replier.reply(printstat(name));
@@ -183,9 +183,8 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
   }
   if(msg.indexOf("/경험치")!=-1&&(sender=="마스터"||sender==Cons.admin)) {
     var arr = msg.split("/");
-    var name;
     if(arr[2]!=undefined) {
-      name=arr[2];
+      var name = arr[2];
       /*
       if(arr[3]==undefined) {
         name=sender;
@@ -196,7 +195,7 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
       */
       PCs[name].경험치 = PCs[name].경험치*1 +1;
       FileStream.write("/sdcard/katalkbot/PCs.json",JSON.stringify(PCs));
-      replier.reply( PCs[name].이름+", 당신은 충분한 경험을 쌓아 경험치를 1 받았습니다!");
+      replier.reply(PCs[name].이름+", 당신은 충분한 경험을 쌓아 경험치를 1 받았습니다!");
       replier.reply(printstat(name));
       }
     }
@@ -212,6 +211,12 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
     else {
       replier.reply(printstat(sender));
     }
+  }
+  if(msg.indexOf("/하중 수정")!=-1||msg.indexOf("/하중수정")!=-1) {
+    var arr = msg.split("/");
+    PCs[sender].하중 = PCs[sender].하중*1 + arr[2]*1;
+    FileStream.write("/sdcard/katalkbot/PCs.json",JSON.stringify(PCs));
+    replier.reply(printstat(sender));
   }
   if(msg==("/능력수정치")||msg==("/능력 수정치")) {
     replier.reply("능력수정치는 주사위 판정에 더해지는 값으로, 능력치에 따라서 정해집니다. 매 판정마다 그에 맞는 능력수정치가 사용되며, +근, +체, +민, +지, +혜, +매의 약자로 표시됩니다.")
