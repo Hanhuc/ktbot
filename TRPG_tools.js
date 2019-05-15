@@ -28,7 +28,7 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
     }
   }
   if(msg=="/도움") {
-    replier.reply("/캐릭터 생성  /캐릭터 삭제\n/캐릭터 정보  /능력수정치\n/주사위/개수d면수/능력치\n  : [/주사위] 이외는 선택사항입니다.\n/피해/피해량/이름  /치유/치유량/이름");
+    replier.reply("/캐릭터 생성  /캐릭터 삭제\n/캐릭터 정보  /능력수정치\n/레벨업\n/주사위/개수d면수/능력치\n  : [/주사위] 이외는 선택사항입니다.");//\n/피해/피해량/이름  /치유/치유량/이름
   }
   if(Cons.PCmake!=0&&(msg=="/캐릭터 생성"||msg=="/캐릭터생성")) {
     replier.reply("다른 사람이 캐릭터를 생성하고 있습니다!");
@@ -109,7 +109,7 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
       }
     }
   }
-  if(msg.indexOf("/피해")!=-1) {
+  if(msg.indexOf("/피해")!=-1&&(sender=="마스터"||sender==Cons.admin)) {
     var arr = msg.split("/");
     var name;
     if(arr[3]==undefined) {
@@ -125,7 +125,7 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
     FileStream.write("/sdcard/katalkbot/PCs.json",JSON.stringify(jtot));
     replier.reply(jtot[name].이름+"에게 "+Math.abs(arr[2])+"의 피해! HP: "+jtot[name].HP+"/"+jtot[name].MAXHP);
   }
-  if(msg.indexOf("/치유")!=-1) {
+  if(msg.indexOf("/치유")!=-1&&(sender=="마스터"||sender==Cons.admin)) {
     var arr = msg.split("/");
     var name;
     if(arr[3]==undefined) {
@@ -141,8 +141,7 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
     FileStream.write("/sdcard/katalkbot/PCs.json",JSON.stringify(jtot));
     replier.reply(jtot[name].이름+"에게 "+Math.abs(arr[2])+"의 치유! HP: "+jtot[name].HP+"/"+jtot[name].MAXHP);
   }
-  if(Cons.lvlup==0&&msg.indexOf("/레벨업")!=-1) {
-    var arr = msg.split("/");
+  if(Cons.lvlup==0&&msg=="/레벨업") {
     var name = sender;
     Cons.lvlUser = name;
 
@@ -175,20 +174,25 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
       Cons.lvlup=0;
     }
   }
-  if(msg.indexOf("/경험치")!=-1) {
+  if(msg.indexOf("/경험치")!=-1&&(sender=="마스터"||sender==Cons.admin)) {
     var arr = msg.split("/");
     var name;
-    if(arr[3]==undefined) {
-      name=sender;
+    if(arr[2]!=undefined) {
+      name=arr[2];
+      /*
+      if(arr[3]==undefined) {
+        name=sender;
+      }
+      else {
+        name=arr[3];
+      }
+      */
+      jtot[name].경험치 = jtot[name].경험치*1 +1;
+      FileStream.write("/sdcard/katalkbot/PCs.json",JSON.stringify(jtot));
+      replier.reply( jtot[name].이름+", 당신은 충분한 경험을 쌓아 경험치를 1 받았습니다!");
+      replier.reply(printstat(name));
+      }
     }
-    else {
-      name=arr[3];
-    }
-    jtot[name].경험치 = jtot[name].경험치*1 +1;
-    FileStream.write("/sdcard/katalkbot/PCs.json",JSON.stringify(jtot));
-    replier.reply("당신은 충분한 경험을 쌓아 경험치를 1 받았습니다!");
-    replier.reply(printstat(name));
-  }
   if(msg.indexOf("/캐릭터 삭제")!=-1) {
     var arr = msg.split("/");
     var json = new Object();
