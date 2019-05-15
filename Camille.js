@@ -19,7 +19,7 @@ Chal1 = new Challanger();
 
 function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName, threadId) {
   if(msg=="바람이여!"||msg=="/reload") {
-    if(sender==Chal1.admin) {
+    if(sender==Chal1.admin||sender=="마스터") {
       Api.reload("Camille.js");
       if(Chal1.compilecheck==0) {
         replier.reply("내 명에 따라라!");

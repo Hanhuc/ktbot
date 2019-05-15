@@ -13,7 +13,7 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
   var jtot = JSON.parse(FileStream.read("/sdcard/katalkbot/PCs.json"));
   var jobs = JSON.parse(FileStream.read("/sdcard/katalkbot/jobs.json"));
   if(msg=="감사합니다!"||msg=="/re") {
-    if(sender==Cons.admin) {
+    if(sender==Cons.admin||sender=="마스터") {
       Api.reload("TRPG_tools.js");
       if(Cons.compilecheck==0) {
         replier.reply("정말 잘하셨어요!");
@@ -210,23 +210,26 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
   if(msg.indexOf("/주사위")!=-1) {// /주사위/num1dnum2/stat
     var arr = msg.split("/");
     var stat;
-    stat = jtot[sender][arr[3]];
     if(arr[2]==undefined) {
       replier.reply(dice1(2,6));
     }
-    else if(arr[2]=="공격") {
-      var num = jobs[jtot[sender].직업].dmg;
-      replier.reply(jtot[sender].이름+"의 기본 피해는 d"+num+"!");
-      replier.reply(dice1(1,num));
-    }
-    else if(stat==undefined) {
-      var num = arr[2].split("d");
-      replier.reply(dice1(num[0],num[1]));
-    }
     else {
-      var num = arr[2].split("d");
-      replier.reply(dice2(num[0],num[1],stat));
+      stat = jtot[sender];
+      if(arr[2]=="공격") {
+        var num = jobs[jtot[sender].직업].dmg;
+        replier.reply(jtot[sender].이름+"의 기본 피해는 d"+num+"!");
+        replier.reply(dice1(1,num));
+      }
+      else if(stat==undefined) {
+        var num = arr[2].split("d");
+        replier.reply(dice1(num[0],num[1]));
+      }
+      else {
+        var num = arr[2].split("d");
+        replier.reply(dice2(num[0],num[1],stat[arr[3]]));
+      }
     }
+
   }
 
   function dice1(num1,num2) {
