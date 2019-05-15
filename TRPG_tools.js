@@ -101,7 +101,7 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
         jtot[sender][arr[3]]=12;
         jtot[sender][arr[4]]=9;
         jtot[sender][arr[5]]=8;
-        jtot[sender].MAXHP=jobs[jtot[sender].직업].HP;
+        jtot[sender].MAXHP=jobs[jtot[sender].직업].HP+jtot[sender].체력;
         jtot[sender].HP=jtot[sender].MAXHP;
         FileStream.write("/sdcard/katalkbot/PCs.json",JSON.stringify(jtot));
         replier.reply("캐릭터 생성이 완료되었습니다!");
@@ -168,6 +168,7 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
     }
     else {
       jtot[name][msg] = jtot[name][msg]*1 +1;
+      jtot[name].MAXHP =jobs[jtot[name].직업].HP+jtot[name].체력;
       FileStream.write("/sdcard/katalkbot/PCs.json",JSON.stringify(jtot));
       replier.reply("해당 능력치가 1 올랐습니다!");
       replier.reply(printstat(name));
