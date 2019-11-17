@@ -12,6 +12,10 @@ function Challanger() {
   this.compilecheck=0;
   this.offensive=0;
   this.offname;
+  this.hot=0;
+  this.eva=0;
+  this.evacount=0;
+  this.evaroom;
 }
 Chal1 = new Challanger();
 
@@ -47,28 +51,49 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
       Chal1.offname="초기화";
     }
     else {
-      if(rand<0.005) {
+      if(rand<0.005&&sender!="최커제") {
+        replier.reply("쌉소리 ㄴ");
+        /*
         replier.reply("뭘 봐, 짜샤!");
         Chal1.offensive=1;
         Chal1.offname=sender;
+        */
       }
       else if(rand<0.01) {
         replier.reply("섹스");
-      }
-      else if(sender=="최커제"&&rand<0.1) {
-        replier.reply("ㄴ이세돌보다 바둑 못함");
       }
       else {
         if(msg=="Hello") {
           replier.reply("Sex");
         }
-
-        if(msg=="이병 박찬후") {
+        if(msg.indexOf("운동")!=-1||msg.indexOf("3대")!=-1||msg.indexOf("벤치")!=-1||msg.indexOf("보충제")!=-1||msg.indexOf("헬스")!=-1||msg.indexOf("리프트")!=-1) {
+          replier.reply("로이더!");
+          replier.reply("로이더!");
+        }
+        if(msg.indexOf("이병 박찬후")!=-1) {
           replier.reply("그래서 짬 맛있냐?");
-        }/*
-        if(msg.indexOf("듯")!=-1) {
-          replier.reply("그러게");
-        }*/
+        }
+        if(msg.indexOf("ㅋㅋㅋㅋㅋㅋㅋ")!=-1) {
+          var rand = Math.floor(Math.random()*4);
+          var print;
+          switch (rand) {
+            case 0:
+              print = "웃어?"
+              break;
+            case 1:
+              print = "웃겨?"
+              break;
+            case 2:
+              print = "재밌어?"
+              break;
+            case 3:
+              print = "웃기냐?"
+              break;
+            default:
+
+          }
+          replier.reply(print);
+        }
       }
     }
   }
@@ -101,6 +126,47 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
         break;
       default:
     }
+  }
+  if(msg.indexOf("이쁘냐")!=-1) {
+    Chal1.hot=1;
+  }
+  if(Chal1.hot>0&&msg.indexOf("이쁘냐")==-1&&sender!="최커제") {
+    Chal1.hot++;
+  }
+  if(Chal1.hot>2&&msg.indexOf("이쁘냐")==-1) {
+    Chal1.hot=0;
+    replier.reply("그래서 이쁘냐?");
+  }
+
+  if(Chal1.evacount>0&&room==Chal1.evaroom) {
+    Chal1.evacount++;
+    if(Chal1.evacount>30) {
+      var print;
+      print = "현재 "+Chal1.eva+" 에바입니다.";
+      print = print + "\n정족수 부족으로 에바 발의가 기각되었습니다.";
+      Chal1.evacount=0;
+      Chal1.eva=0;
+      replier.reply(print);
+    }
+  }
+
+  if(msg.indexOf("에바")!=-1||msg.indexOf("에반데")!=-1) {
+    if(Chal1.eva==0) {
+      Chal1.evacount = 1;
+      Chal1.evaroom = room;
+    }
+    if(room == Chal1.evaroom) {
+      Chal1.eva++;
+      print = "현재 "+Chal1.eva+" 에바입니다.";
+      if(Chal1.eva==3&&Chal1.evacount<30) {
+        Chal1.eva = 0;
+        print = print + "\n삼진 에바로 기각되었습니다.";
+      }
+    }
+    else {
+      print = "현재 다른 방에서 에바가 발의된 상태입니다. 잠시 후에 이용해 주십시오."
+    }
+    replier.reply(print);
   }
   if(sender=="무일농원 박인성"){
     var rand = Math.floor(Math.random()*5)

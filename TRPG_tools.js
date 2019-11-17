@@ -28,7 +28,7 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
     }
   }
   if(msg=="/도움") {
-    replier.reply("/캐릭터 생성  /캐릭터 삭제\n/캐릭터 정보  /능력수정치\n/레벨업  /하중수정/(무게)\n/주사위/개수d면수/능력치\n  : [/주사위] 이외는 선택사항입니다.");//\n/피해/이름/피해량  /치유/이름/치유량
+    replier.reply("/캐릭터 생성  /캐릭터 삭제\n/캐릭터 정보  /능력수정치\n/레벨업  /하중수정/(무게)\n/비고 /비고수정/(구분)/(들어갈 내용)\n/장비  /장비수정/(새 장비 목록)\n     : !!!장비 목록이 새로 작성되므로 필요시 기존 장비를 같이 입력해 주어야 함!!!\n/주사위/개수d면수/능력치\n      : [/주사위] 이외는 선택사항");//\n/피해/이름/피해량  /치유/이름/치유량
   }
   if(Cons.PCmake!=0&&(msg=="/캐릭터 생성"||msg=="/캐릭터생성")) {
     replier.reply("다른 사람이 캐릭터를 생성하고 있습니다!");
@@ -58,11 +58,13 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
       replier.reply("도적 드루이드 마법사 사냥꾼 사제 성기사 음유시인 전사");
     }
     else {
+      var misc = new Object();
       json[sender]={
         "이름": arr[0],
         "직업": arr[1],
         "MAXHP": 0,
         "HP": 0,
+        "한계하중": 0,
         "하중": 0,
         "레벨": 1,
         "경험치": 0,
@@ -71,7 +73,8 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
         "체력": 0,
         "지능": 0,
         "지혜": 0,
-        "매력": 0
+        "매력": 0,
+        "비고": misc
       }
       PCs = Object.assign(json,PCs);
       FileStream.write("/sdcard/katalkbot/PCs.json",JSON.stringify(PCs));
@@ -103,6 +106,7 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
         PCs[sender][arr[5]]=8;
         PCs[sender].MAXHP=jobs[PCs[sender].직업].HP+PCs[sender].체력;
         PCs[sender].HP=PCs[sender].MAXHP;
+        PCs[sender].한계하중=jobs[PCs[sender].직업].하중+PCs[sender].근력;
         FileStream.write("/sdcard/katalkbot/PCs.json",JSON.stringify(PCs));
         replier.reply("캐릭터 생성이 완료되었습니다!");
         Cons.PCmake=0;
@@ -175,6 +179,8 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
     else {
       PCs[name][msg] = PCs[name][msg]*1 +1;
       PCs[name].MAXHP =jobs[PCs[name].직업].HP*1+PCs[name].체력*1;
+      PCs[name].한계하중 =jobs[PCs[name].직업].하중*1+PCs[name].근력*1;
+
       FileStream.write("/sdcard/katalkbot/PCs.json",JSON.stringify(PCs));
       replier.reply("해당 능력치가 1 올랐습니다!");
       replier.reply(printstat(name));
@@ -197,8 +203,60 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
       FileStream.write("/sdcard/katalkbot/PCs.json",JSON.stringify(PCs));
       replier.reply(PCs[name].이름+", 당신은 충분한 경험을 쌓아 경험치를 1 받았습니다!");
       replier.reply(printstat(name));
-      }
     }
+  }
+  if((msg.indexOf("/하중 수정")!=-1||msg.indexOf("/하중수정")!=-1)&&sender!="마스터") {
+    var arr = msg.split("/");
+    PCs[sender].하중 = PCs[sender].하중*1 + arr[2]*1;
+    FileStream.write("/sdcard/katalkbot/PCs.json",JSON.stringify(PCs));
+    replier.reply(printstat(sender));
+  }
+  else if((msg.indexOf("/하중 수정")!=-1||msg.indexOf("/하중수정")!=-1)&&sender=="마스터") {
+    var arr = msg.split("/");
+    PCs[arr[2]].하중 = PCs[arr[2]].하중*1 + arr[3]*1;
+    FileStream.write("/sdcard/katalkbot/PCs.json",JSON.stringify(PCs));
+    replier.reply(printstat(arr[2]));
+  }
+  if((msg.indexOf("/비고 수정")!=-1||msg.indexOf("/비고수정")!=-1)&&sender!="마스터") {
+    var arr = msg.split("/");
+    PCs[sender].비고[arr[2]] = arr[3];
+    FileStream.write("/sdcard/katalkbot/PCs.json",JSON.stringify(PCs));
+    replier.reply("수정 완료!");
+  }
+  else if((msg.indexOf("/비고 수정")!=-1||msg.indexOf("/비고수정")!=-1)&&sender=="마스터") {
+    var arr = msg.split("/");
+    PCs[arr[2]].비고[arr[3]] = arr[4];
+    FileStream.write("/sdcard/katalkbot/PCs.json",JSON.stringify(PCs));
+    replier.reply("수정 완료!");
+  }
+  else if(msg=="/비고") {
+    replier.reply(printmisc(sender));
+  }
+  else if(msg.indexOf("/비고")!=-1) {
+    var arr = msg.split("/");
+    replier.reply(printmisc(arr[2]));
+  }
+
+  if((msg.indexOf("/장비 수정")!=-1||msg.indexOf("/장비수정")!=-1)&&sender!="마스터") {
+    var arr = msg.split("/");
+    PCs[sender].장비 = arr[2];
+    FileStream.write("/sdcard/katalkbot/PCs.json",JSON.stringify(PCs));
+    replier.reply("수정 완료!");
+  }
+  else if((msg.indexOf("/장비 수정")!=-1||msg.indexOf("/장비수정")!=-1)&&sender=="마스터") {
+    var arr = msg.split("/");
+    PCs[arr[2]].장비 = arr[3];
+    FileStream.write("/sdcard/katalkbot/PCs.json",JSON.stringify(PCs));
+    replier.reply("수정 완료!");
+  }
+  else if(msg=="/장비") {
+    replier.reply(JSON.stringify(PCs[sender].장비));
+  }
+  else if(msg.indexOf("/장비")!=-1) {
+    var arr = msg.split("/");
+    replier.reply(JSON.stringify(PCs[arr[2]].장비));
+  }
+
   if(msg.indexOf("/캐릭터 삭제")!=-1) {
     var arr = msg.split("/");
     var json = new Object();
@@ -212,12 +270,7 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
       replier.reply(printstat(sender));
     }
   }
-  if(msg.indexOf("/하중 수정")!=-1||msg.indexOf("/하중수정")!=-1) {
-    var arr = msg.split("/");
-    PCs[sender].하중 = PCs[sender].하중*1 + arr[2]*1;
-    FileStream.write("/sdcard/katalkbot/PCs.json",JSON.stringify(PCs));
-    replier.reply(printstat(sender));
-  }
+  
   if(msg==("/능력수정치")||msg==("/능력 수정치")) {
     replier.reply("능력수정치는 주사위 판정에 더해지는 값으로, 능력치에 따라서 정해집니다. 매 판정마다 그에 맞는 능력수정치가 사용되며, +근, +체, +민, +지, +혜, +매의 약자로 표시됩니다.")
     replier.reply("\n1~3:      -3\n4~5:     -2\n6~8:     -1\n9~12:     0\n13~15: +1\n16~17: +2\n18:       +3");
@@ -293,6 +346,16 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
     return print;
   }
   function printstat(name) {
-    return "이름: "+PCs[name].이름+"\n직업: "+PCs[name].직업+"\n+=+=+=+=+=+\n레벨: "+PCs[name].레벨+"  경험치: "+PCs[name].경험치+"\nHP: "+PCs[name].HP+"/"+PCs[name].MAXHP+"  하중: "+PCs[name].하중+"\n+=+=+=+=+=+\n근력: "+PCs[name].근력+"  체력: "+PCs[name].체력+"\n민첩: "+PCs[name].민첩+"  지능: "+PCs[name].지능+"\n지혜: "+PCs[name].지혜+"  매력: "+PCs[name].매력;
+    return "이름: "+PCs[name].이름+"\n직업: "+PCs[name].직업+"\n+=+=+=+=+=+\n레벨: "+PCs[name].레벨+"  경험치: "+PCs[name].경험치+"\nHP: "+PCs[name].HP+"/"+PCs[name].MAXHP+"  하중: "+PCs[name].하중+"/"+PCs[name].한계하중+"\n+=+=+=+=+=+\n근력: "+PCs[name].근력+"  체력: "+PCs[name].체력+"\n민첩: "+PCs[name].민첩+"  지능: "+PCs[name].지능+"\n지혜: "+PCs[name].지혜+"  매력: "+PCs[name].매력;
+  }
+  function printmisc(name) {
+    var misc = JSON.stringify(PCs[name].비고);/*
+    var arr = misc.split(",");
+    var len = arr.length();
+    var print = "비고 사항\n";
+    for(var i = 0; i < len; i++) {
+      print = print+arr[i]+"\n";
+    }*/
+    return misc;
   }
 }
